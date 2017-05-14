@@ -1,12 +1,11 @@
 package com.carrizosa.michelle.tictactoe;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView announceDisplayer;
     private Player currentPlayer;
 
+    private SharedPreferences savedValues;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +61,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        this.startGame();
+        this.savedValues = getSharedPreferences("SavedValues", MODE_PRIVATE);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        this.currentPlayer = Player.valueOf(this.savedValues.getString("currentPlayer", "O"));
+        this.displayCurrentPlayer();
+    }
+
+    @Override
+    protected void onPause(){
+        SharedPreferences.Editor editor = savedValues.edit();
+        editor.putString("currentPlayer", this.currentPlayer.toString());
+        editor.commit();
+
+        super.onPause();
     }
 
     private void clearGrid(){
